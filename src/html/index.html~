@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>KorkyLauncher</title>
+    <script src="../scripts/client.js"></script>
+    <script src="../scripts/warning.js"></script>
+    <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+<div class="container">
+    <div class="look center">Look to the right for status! Red are errors!</div>
+    <div class="login">
+        <div class="titleBar"></div>
+        <h2>Please login using your Mojang account</h2>
+        <div class="wrapper">
+            <div class="textArea">
+                <div class="text">Username</div>
+                <input class="box" id="username">
+            </div>
+            <div class="textArea">
+              <div class="text">Password (NOT NEEDED
+		<span style="font-size:14px">UNLESS YOU WANT TO PLAY USING MOJANG ACC.)</span>
+	      </div>
+                <input class="box" type="password" id="password">
+            </div>
+        </div>
+        <div class="text textArea">
+            Version: <input class="versionBox" id="version">
+        </div>
+        <span class="login-button">
+            <button onclick="init()">Launch</button>
+        </span>
+    </div>
+</div>
+</body>
+</html>

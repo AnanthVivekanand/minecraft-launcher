@@ -1,0 +1,118 @@
+/*
+ _  __          _          _                           _
+| |/ /___  _ __| | ___   _| |    __ _ _   _ _ __   ___| |__   ___ _ __
+| ' // _ \| '__| |/ / | | | |   / _` | | | | '_ \ / __| '_ \ / _ \ '__|
+| . \ (_) | |  |   <| |_| | |__| (_| | |_| | | | | (__| | | |  __/ |
+|_|\_\___/|_|  |_|\_\\__, |_____\__,_|\__,_|_| |_|\___|_| |_|\___|_|
+                     |___/
+*/
+
+const fs = require('fs');
+const { red } = require ('ansicolor')
+const { Authenticator, Client} = require("kl-core");
+const client = new Client();
+
+window.onload = (e) => {
+    console.log(red.underline.bright("========INSTRUCTIONS======== \n DON'T CLOSE THE INSPECT ELEMENT \n") +
+		"1) expand the window so you can see the start button \n" +
+		"2) Type any username, a password is not needed \n" +
+		"3) Type in the version you want, ex: 1.12.2 or 1.14.4 or 1.8.9 \n" +
+		"4) Click launch \n" +
+		red.underline.bright("5) BE PATIENT, IT WILL TAKE A WHILE FOR EVERYTHING TO DOWNLOAD, maybe around 3-5 minutes \n")
+	       );
+    if(localStorage.getItem('auth')) {
+        const auth = JSON.parse(localStorage.getItem('auth'));
+        document.querySelector('.login > h2').innerText = `Last logged in as: ${auth.name}`;
+        document.getElementById("username").value = auth.name;
+        if (auth.version) document.getElementById("version").value = auth.version;
+	else document.getElementById("version").value = "1.12.2";
+        if(auth.offline) return;
+        Authenticator.validate(auth.access_token, auth.client_token).then(e => {
+            document.querySelector('.login > h2').innerText = `Logged in as: ${auth.name}`;
+            document.getElementsByClassName('wrapper')[0].classList.add('disabled');
+        }).catch(e => {
+            console.warn(e)
+        })
+    }
+};
+
+async function init() {
+/*
+    if(localStorage.getItem('auth')) {
+        const auth = JSON.parse(localStorage.getItem('auth'));
+        if(auth.offline) {
+            await processClient(JSON.parse(localStorage.getItem('auth')));
+            return;
+        }
+        Authenticator.validate(auth.access_token, auth.client_token).then(async e => {
+            await processClient(JSON.parse(localStorage.getItem('auth')));
+        }).catch(e => {
+            prependError('wrongPass');
+            console.warn(e)
+        });
+        return;
+    }
+*/
+    const login = {
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value
+    };
+
+    if(!login.username) {
+        prependError('missingField');
+    }
+
+    Authenticator.getAuth(login.username, login.password).then(async e => {
+        if(!login.password) e.offline = true;
+	e.version = document.getElementById("version").value;
+        localStorage.setItem('auth', JSON.stringify(e));
+        await processClient(e);
+    }).catch(e => {
+        prependError('wrongPass');
+        console.warn(e);
+    });
+}
+
+async function processClient(e) {
+    document.getElementsByClassName('login')[0].classList.add('disabled');
+    document.getElementsByClassName('look')[0].style.display = "block";
+    await client.launch({
+        authorization: e,
+        root: require('os').homedir() + "/mc_game",
+        version: {
+            number: document.getElementsByClassName('versionBox')[0].value,
+            type: "release"
+        },
+        memory: {
+            max: "1024",
+            min: "1024"
+        },
+        overrides: {
+          url: {
+              meta: "http://launchermeta.mcnet.djelectro.me", // List of versions.
+             resource: "https://raw.githubusercontent.com/AnanthVivekanand/minecraft-assets/master/resources", // Minecraft resources.
+             mavenForge: "http://files.minecraftforge.net/maven/", // Forge resources.
+             defaultRepoForge: "http://webmine.tuxtoke.life/testing/host" // for Forge only, you need to redefine the library url
+                                                                  // in the version json.
+          }
+       }
+    }).catch(e => {
+        prependError('genericError', e.message)
+    })
+}
+
+client.on('debug', (e) => console.log(e));
+client.on('data', (e) => console.log(e));
+client.on('close', (e) => {
+    document.getElementsByClassName('login')[0].classList.remove('disabled');
+    document.getElementsByClassName('look')[0].style.display = "none";
+});
+
+/*
+ _  __          _          _                           _
+| |/ /___  _ __| | ___   _| |    __ _ _   _ _ __   ___| |__   ___ _ __
+| ' // _ \| '__| |/ / | | | |   / _` | | | | '_ \ / __| '_ \ / _ \ '__|
+| . \ (_) | |  |   <| |_| | |__| (_| | |_| | | | | (__| | | |  __/ |
+|_|\_\___/|_|  |_|\_\\__, |_____\__,_|\__,_|_| |_|\___|_| |_|\___|_|
+                     |___/
+*/

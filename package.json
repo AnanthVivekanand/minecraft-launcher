@@ -1,0 +1,23 @@
+{
+  "name": "korky-launcher",
+  "version": "2.1.0",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder -wm"
+  },
+  "description": "~",
+  "main": "main.js",
+  "author": "Ananth Vivekanand",
+  "license": "ISC",
+  "dependencies": {
+    "ansicolor": "^1.1.93",
+    "ansicolors": "^0.3.2",
+    "kl-core": "file:core",
+    "njre": "^0.2.0"
+  },
+  "devDependencies": {
+    "electron": "^6.1.9",
+    "electron-builder": "^22.2.0"
+  }
+}
